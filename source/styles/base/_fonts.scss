@@ -1,16 +1,25 @@
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:string';
+
 @mixin font-face($fontname, $filename, $style: null, $weight: null, $exts: woff2 woff) {
   $src: null;
   $extmods: (
-          eot: '?'
+    eot: '?'
   );
 
-  @each $ext in $exts{
-    $extmod: if(map-has-key($extmods, $ext), $ext + map-get($extmods, $ext), $ext);
-    $src: append($src, url('../../fonts/' + quote($filename + "." + $extmod)) format($ext), comma);
+  @each $ext in $exts {
+    $extmod: $ext;
+
+    @if map.has-key($extmods, $ext) {
+      $extmod: $ext + map.get($extmods, $ext);
+    }
+
+    $src: list.append($src, url('../../fonts/' + string.quote($filename + '.' + $extmod)) format($ext), comma);
   }
 
   @font-face {
-    font-family: quote($fontname);
+    font-family: string.quote($fontname);
     font-style: $style;
     font-weight: $weight;
     font-display: swap;

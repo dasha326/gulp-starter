@@ -1,3 +1,5 @@
+import { sliderInit } from './utils.js';
+
 window.addEventListener('DOMContentLoaded', () => {
   // Инициализация всей слайдеров на странице по дата атрибуту
   const sliderSectionElems = document.querySelectorAll('[data-slider]');
@@ -9,4 +11,4 @@ window.addEventListener('DOMContentLoaded', () => {
       sliderInit(sliderSectionEl, swiperArrows, swiperCounter);
     });
   }
-})
+});

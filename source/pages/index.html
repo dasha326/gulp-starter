@@ -1,10 +1,17 @@
-@@include('../parts/layout/_head.html',{
-'lang':'ru',
-'title':'Карта сайта',
-'description':'',
-'keywords':'',
-'favicon':'img/favicons/favicon',
+@@include('../parts/layout/_page-start.html',{
+  lang: 'ru',
+  title: 'Карта сайта',
+  description: '',
+  keywords: '',
+  bodyClass: 'page-index'
 })
-<h1>Карта сайта</h1>
-<a href="main-page.html" target="_blank">main-page.html</a>
+<main class="main">
+  <div class="container">
+    <h1>Карта сайта</h1>
+    <a href="main-page.html" target="_blank" rel="noopener noreferrer">main-page.html</a>
+  </div>
+</main>
+@@include('../parts/layout/_footer.html')
+@@include('../parts/layout/_scripts.html')
+@@include('../parts/layout/_page-end.html')
 

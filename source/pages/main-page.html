@@ -1,17 +1,15 @@
-<!DOCTYPE html>
-<html lang="ru">
-@@include('../parts/layout/_head.html',{
-title:'Главная страница',
-description:'',
-keywords:'',
-favicon: 'favicon.ico',
+@@include('../parts/layout/_page-start.html',{
+  lang: 'ru',
+  title: 'Главная страница',
+  description: '',
+  keywords: '',
+  bodyClass: 'page-index'
 })
-<body class="page-index">
 @@include('../parts/layout/_header.html')
 <img src="images/cat-back-pro.svg" alt="Логотип" width="97" height="30">
 <main class="main">
   <div class="container">
-    <h1>Главная страница4</h1>
+    <h1>Главная страница</h1>
     <div class="swiper mySwiper">
       <div class="swiper-wrapper">
         <div class="swiper-slide">Slide 1</div>
@@ -31,5 +29,4 @@ favicon: 'favicon.ico',
 </main>
 @@include('../parts/layout/_footer.html')
 @@include('../parts/layout/_scripts.html')
-</body>
-</html>
+@@include('../parts/layout/_page-end.html')

@@ -5,9 +5,8 @@ import plumber from 'gulp-plumber';
 import * as dartSass from 'sass';
 import gulpSass from 'gulp-sass';
 import postcss from 'gulp-postcss';
-import rename from 'gulp-rename';
 import autoprefixer from 'autoprefixer';
-import csso from 'postcss-csso';
+import cssnano from 'cssnano';
 import sortMediaQueries from 'postcss-sort-media-queries';
 import includePartials from 'gulp-file-include';
 import { createGulpEsbuild } from 'gulp-esbuild';
@@ -15,7 +14,6 @@ import browserslistToEsbuild from 'browserslist-to-esbuild';
 import imagemin, {gifsicle, mozjpeg, optipng, svgo} from 'gulp-imagemin';
 import { stacksvg } from 'gulp-stacksvg';
 import server from 'browser-sync';
-import bemlinter from 'gulp-html-bemlinter';
 
 const { src, dest, watch, series, parallel } = gulp;
 const sass = gulpSass(dartSass);
@@ -30,6 +28,19 @@ const PATHS_TO_STATIC = [
 ];
 let isDevelopment = true;
 let OUTPUT_PATH;
+
+function getStylePlugins() {
+  const plugins = [
+    autoprefixer(),
+    sortMediaQueries(),
+  ];
+
+  if (!isDevelopment) {
+    plugins.push(cssnano());
+  }
+
+  return plugins;
+}
 
 /* Работа с HTML - сборка частей и страниц */
 export function createHTML () {
@@ -48,14 +59,7 @@ export function createStyles () {
   return src(`${PATH_TO_SOURCE}styles/*.scss`, { sourcemaps: isDevelopment })
     .pipe(plumber())
     .pipe(sass().on('error', sass.logError))
-    .pipe(postcss([
-      autoprefixer(),
-      sortMediaQueries(),
-      csso()
-    ]))
-    .pipe(rename({
-      extname: '.min.css'
-    }))
+    .pipe(postcss(getStylePlugins()))
     .pipe(dest(`${OUTPUT_PATH}styles`, { sourcemaps: isDevelopment }))
     .pipe(server.stream());
 }
@@ -63,12 +67,15 @@ export function createStyles () {
 /* Работа со скриптами */
 export function createScripts () {
   const gulpEsbuild = createGulpEsbuild({ incremental: isDevelopment });
+  const entryPoint = `${PATH_TO_SOURCE}js/scripts.js`;
 
-  return src(`${PATH_TO_SOURCE}js/*.js`)
+  return src(entryPoint)
     .pipe(plumber())
     .pipe(gulpEsbuild({
+      entryPoints: [entryPoint],
+      outfile: 'scripts.js',
       bundle: true,
-      format: 'esm',
+      format: 'iife',
       platform: 'browser',
       minify: !isDevelopment,
       sourcemap: isDevelopment,
@@ -104,7 +111,7 @@ export function optimizeImage () {
           {
             name: 'cleanupIDs',
             active: false
-          }
+          },
         ]
       })
     ]))
@@ -152,12 +159,12 @@ export function startServer () {
     ui: false,
   }, (err, bs) => {
     bs.addMiddleware('*', (req, res) => {
-      // res.write(readFileSync(`${PATH_TO_DIST}404.html`));
+      res.statusCode = 404;
       res.end();
     });
   });
 
-  watch(`${PATH_TO_SOURCE}**/*.{html,njk}`, series(createHTML));
+  watch(`${PATH_TO_SOURCE}**/*.html`, series(createHTML));
   watch(`${PATH_TO_SOURCE}styles/**/*.scss`, series(createStyles));
   watch(`${PATH_TO_SOURCE}js/**/*.js`, series(createScripts));
   watch(`${PATH_TO_SOURCE}icons/**/*.svg`, series(createStack, reloadServer));
@@ -170,8 +177,12 @@ function reloadServer (done) {
   done();
 }
 
-/* Очищение папки */
-export function removeDist (done) {
+/* Очищение рабочих папок */
+export function clean (done) {
+  rmSync(PATH_TO_DEV, {
+    force: true,
+    recursive: true,
+  });
   rmSync(PATH_TO_DIST, {
     force: true,
     recursive: true,
@@ -180,11 +191,11 @@ export function removeDist (done) {
 }
 
 /* Полная сборка */
-export function buildProd (done) {
+export function build (done) {
   isDevelopment = false;
   OUTPUT_PATH = isDevelopment ? PATH_TO_DEV : PATH_TO_DIST;
   series(
-    removeDist,
+    clean,
     parallel(
       createHTML,
       createStyles,
@@ -196,10 +207,11 @@ export function buildProd (done) {
   )(done);
 }
 /* Сборка для разработки */
-export function runDev (done) {
-  OUTPUT_PATH = isDevelopment ? PATH_TO_DEV : PATH_TO_DIST
+export function dev (done) {
+  isDevelopment = true;
+  OUTPUT_PATH = isDevelopment ? PATH_TO_DEV : PATH_TO_DIST;
   series(
-    removeDist,
+    clean,
     parallel(
       createHTML,
       createStyles,
@@ -210,3 +222,8 @@ export function runDev (done) {
     startServer,
   )(done);
 }
+
+export {
+  createStyles as styles,
+  createScripts as scripts,
+};

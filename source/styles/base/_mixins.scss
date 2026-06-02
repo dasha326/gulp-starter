@@ -1,11 +1,18 @@
-@function remy($pxsize) {
-  @return calc($pxsize / 16) + rem;
-}
+@use 'sass:map';
+@use 'sass:selector';
+
+@use './variables' as *;
 
 // Добавление символа &, если не корневой селектор
 @mixin optional-at-root($selector) {
-  @at-root #{if(not &, $selector, selector-append(&, $selector))} {
-    @content;
+  @if not & {
+    @at-root #{$selector} {
+      @content;
+    }
+  } @else {
+    @at-root #{selector.append(&, $selector)} {
+      @content;
+    }
   }
 }
 
@@ -46,18 +53,32 @@
 
 //Media queries
 @function breakpoint-min($name, $breakpoints: $grid-breakpoints) {
-  $min: map-get($breakpoints, $name);
-  @return if($min != 0, $min, null);
+  $min: map.get($breakpoints, $name);
+
+  @if $min != 0 {
+    @return $min;
+  }
+
+  @return null;
 }
 
 @function breakpoint-max($name, $breakpoints: $grid-breakpoints) {
-  $max: map-get($breakpoints, $name);
-  @return if($max and $max > 0, $max - .02, null);
+  $max: map.get($breakpoints, $name);
+
+  @if $max and $max > 0 {
+    @return $max - .02;
+  }
+
+  @return null;
 }
 
 
 @function breakpoint-infix($name, $breakpoints: $grid-breakpoints) {
-  @return if(breakpoint-min($name, $breakpoints) == null, "", "-#{$name}");
+  @if not breakpoint-min($name, $breakpoints) {
+    @return '';
+  }
+
+  @return '-#{$name}';
 }
 @mixin media-breakpoint-up($name, $breakpoints: $grid-breakpoints) {
   $min: breakpoint-min($name, $breakpoints);

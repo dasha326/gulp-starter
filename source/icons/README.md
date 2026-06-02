@@ -1,7 +1,7 @@
-# Папка для иконок подающих в стак или спрайт
+# Папка для иконок, попадающих в `stack.svg`
 
-1. Все названия написаны латиницей с маленькой буквы, отделены тире. 
-2. Из названия должно быть понятно что изображено на картинке
+1. Все названия пишутся латиницей в нижнем регистре и разделяются тире.
+2. По имени должно быть понятно, что изображено на иконке.
 
 ### Неправильно
 ```shell
@@ -23,16 +23,16 @@
         └── credit-card.svg
 ```
 
-## Подключение иконки с помощью тега `svg`
+## Подключение иконки в HTML
 ```html
 <svg width="18" height="12">
-  <use href="../images/stack.svg#clock"></use>
+  <use href="../images/stack.svg#menu"></use>
 </svg>
 ```
 
 ## Подключение иконки в стилях
 ```css
-.icon::before{
+.icon::before {
   content: "";
   position: absolute;
   top: 0;
@@ -41,8 +41,8 @@
   height: 32px;
   mask-image: url("../images/stack.svg#close");
   mask-size: contain;
-  mask-position: -8px;
+  mask-position: center;
   mask-repeat: no-repeat;
-  background-color: red;
+  background-color: currentcolor;
 }
 ```

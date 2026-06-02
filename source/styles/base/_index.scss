@@ -1,6 +1,6 @@
-@import "mixins";
-@import "root";
-@import "variables";
-@import "fonts";
-@import "global";
-@import "titles";
+@forward 'variables';
+@forward 'mixins';
+@forward 'root';
+@forward 'fonts';
+@forward 'global';
+@forward 'titles';
