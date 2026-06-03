@@ -65,6 +65,7 @@ npm ci
 - HTML собирается из страниц и частей через `gulp-file-include`.
 - CSS собирается из `source/styles/styles.scss` в `styles/styles.css`.
 - JS собирается через `esbuild`, основной entry point по умолчанию: `source/js/scripts.js`.
+- При `npm run build` для `.jpg` и `.png` из `source/images` дополнительно создаются `.webp` в `dist/images` (оригиналы остаются). Подключение — через `source/parts/_picture.html`, подробнее в `source/images/README.md`.
 
 ## Папки проекта
 

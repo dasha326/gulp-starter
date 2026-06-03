@@ -12,12 +12,17 @@ import includePartials from 'gulp-file-include';
 import { createGulpEsbuild } from 'gulp-esbuild';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
 import imagemin, {gifsicle, mozjpeg, optipng, svgo} from 'gulp-imagemin';
+import webp from 'gulp-webp';
 import { stacksvg } from 'gulp-stacksvg';
 import server from 'browser-sync';
 
 const { src, dest, watch, series, parallel } = gulp;
 const sass = gulpSass(dartSass);
 const PATH_TO_SOURCE = './source/';
+const PATH_TO_RASTER_IMAGES = [
+  `${PATH_TO_SOURCE}images/**/*.{jpg,jpeg,png}`,
+  `!${PATH_TO_SOURCE}**/README.md`,
+];
 const PATH_TO_DEV = './dev-server/';
 const PATH_TO_DIST = './dist/';
 const PATHS_TO_STATIC = [
@@ -96,8 +101,9 @@ export function createStack () {
 export function optimizeImage () {
   return src([
     `${PATH_TO_SOURCE}images/**/*`,
+    `!${PATH_TO_SOURCE}images/**/*.webp`,
     `!${PATH_TO_SOURCE}**/README.md`,
-    ])
+  ])
     .pipe(imagemin([
       gifsicle({interlaced: true}),
       mozjpeg({quality: 75, progressive: true}),
@@ -115,6 +121,14 @@ export function optimizeImage () {
         ]
       })
     ]))
+    .pipe(dest(`${PATH_TO_DIST}images/`));
+}
+
+/* WebP-копии для JPG и PNG (только prod, рядом с оригиналами в dist) */
+export function createWebp () {
+  return src(PATH_TO_RASTER_IMAGES, { allowEmpty: true })
+    .pipe(plumber())
+    .pipe(webp({ quality: 80 }))
     .pipe(dest(`${PATH_TO_DIST}images/`));
 }
 
@@ -201,6 +215,7 @@ export function build (done) {
       createStyles,
       createScripts,
       optimizeImage,
+      createWebp,
       createStack,
       copyAssets
     ),
@@ -226,4 +241,5 @@ export function dev (done) {
 export {
   createStyles as styles,
   createScripts as scripts,
+  createWebp as webp,
 };

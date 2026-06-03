@@ -15,7 +15,8 @@
       $extmod: $ext + map.get($extmods, $ext);
     }
 
-    $src: list.append($src, url('../../fonts/' + string.quote($filename + '.' + $extmod)) format($ext), comma);
+    $font-src: url('../../fonts/#{$filename}.#{$extmod}') format(string.quote('#{$ext}'));
+    $src: list.append($src, $font-src, comma);
   }
 
   @font-face {

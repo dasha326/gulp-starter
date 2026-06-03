@@ -1,0 +1,11 @@
+@use 'sass:math';
+
+@function remy($pxsize) {
+  @return calc($pxsize / 16) + rem;
+}
+
+// Функция для преобразования px в vw
+@function px-to-vw($pixels, $viewport-width: 1440) {
+  $result:  math.div($pixels, $viewport-width) * 100vw;
+  @return $result;
+}

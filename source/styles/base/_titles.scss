@@ -16,9 +16,12 @@
 
 @each $name, $value in $titles {
   #{$name}, .#{$name} {
-    font-size: remy(map.get($titles-mob, $name));
-    @include media-breakpoint-up(md) {
-      font-size: remy($value);
+    font-size: #{map.get($titles-mob, $name)}px;
+    @include media-breakpoint-up(sm) {
+      font-size: clamp(#{map.get($titles-mob, $name)}px, px-to-vw(map.get($titles-tabs, $name), map.get($grid-breakpoints, md)), #{map.get($titles-tabs, $name)}px);
+    }
+    @include media-breakpoint-up(lg) {
+      font-size: clamp(#{map.get($titles-tabs, $name)}px, px-to-vw($value), #{$value}px);
     }
   }
 }
